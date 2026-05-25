@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% block title %}TRANSFORM{% endblock %}
+{% block page_number %}03{% endblock %}
+{% block page_title %}TRANSFORMASI BILANGAN{% endblock %}
+{% block page_desc %}BASIS / SUHU / MATA UANG / FAKTORIAL / FIBONACCI{% endblock %}
+{% block page_icon %}~{% endblock %}
+
+{% block content %}
+<div class="transform-page">
+
+    <!-- TAB NAV -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('base')">&#9632; BASIS</button>
+        <button class="tab-btn" onclick="switchTab('temperature')">&#9632; SUHU</button>
+        <button class="tab-btn" onclick="switchTab('currency')">&#9632; MATA UANG</button>
+        <button class="tab-btn" onclick="switchTab('factorial')">&#9632; FAKTORIAL</button>
+        <button class="tab-btn" onclick="switchTab('fibonacci')">&#9632; FIBONACCI</button>
+    </div>
+
+    <!-- BASE CONVERSION -->
+    <div id="tab-base" class="tab-content active">
+        <div class="calc-layout">
+            <div class="panel panel-left">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>KONVERSI BASIS</span></div>
+                <div class="input-group">
+                    <label class="input-label">NILAI INPUT</label>
+                    <input type="text" id="base-value" class="brutal-input" placeholder="Masukkan nilai">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">DARI BASIS</label>
+                    <select id="base-from" class="brutal-select">
+                        <option value="decimal">DECIMAL (10)</option>
+                        <option value="binary">BINARY (2)</option>
+                        <option value="octal">OCTAL (8)</option>
+                        <option value="hexadecimal">HEXADECIMAL (16)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">KE BASIS</label>
+                    <select id="base-to" class="brutal-select">
+                        <option value="binary">BINARY (2)</option>
+                        <option value="octal">OCTAL (8)</option>
+                        <option value="hexadecimal">HEXADECIMAL (16)</option>
+                        <option value="decimal">DECIMAL (10)</option>
+                    </select>
+                </div>
+                <button class="calc-btn" onclick="doTransform('base')">
+                    <span>&#9654; KONVERSI SEKARANG</span>
+                </button>
+                <div id="base-error" class="error-box hidden"></div>
+            </div>
+            <div class="panel panel-right">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>HASIL KONVERSI</span></div>
+                <div id="base-output" class="output-area"><div class="output-placeholder"><div class="placeholder-symbol">&#9632;</div><p>MASUKKAN NILAI DAN TEKAN KONVERSI</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEMPERATURE -->
+    <div id="tab-temperature" class="tab-content">
+        <div class="calc-layout">
+            <div class="panel panel-left">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>KONVERSI SUHU</span></div>
+                <div class="input-group">
+                    <label class="input-label">NILAI SUHU</label>
+                    <input type="number" id="temp-value" class="brutal-input" placeholder="Masukkan suhu" step="any">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">DARI SATUAN</label>
+                    <select id="temp-from" class="brutal-select">
+                        <option value="celsius">CELSIUS (C)</option>
+                        <option value="fahrenheit">FAHRENHEIT (F)</option>
+                        <option value="kelvin">KELVIN (K)</option>
+                        <option value="reamur">REAMUR (Re)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">KE SATUAN</label>
+                    <select id="temp-to" class="brutal-select">
+                        <option value="fahrenheit">FAHRENHEIT (F)</option>
+                        <option value="kelvin">KELVIN (K)</option>
+                        <option value="celsius">CELSIUS (C)</option>
+                        <option value="reamur">REAMUR (Re)</option>
+                    </select>
+                </div>
+                <button class="calc-btn" onclick="doTransform('temperature')">
+                    <span>&#9654; KONVERSI SEKARANG</span>
+                </button>
+                <div id="temperature-error" class="error-box hidden"></div>
+            </div>
+            <div class="panel panel-right">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>HASIL KONVERSI</span></div>
+                <div id="temperature-output" class="output-area"><div class="output-placeholder"><div class="placeholder-symbol">&#9632;</div><p>MASUKKAN SUHU DAN TEKAN KONVERSI</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CURRENCY -->
+    <div id="tab-currency" class="tab-content">
+        <div class="calc-layout">
+            <div class="panel panel-left">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>KONVERSI MATA UANG</span></div>
+                <div class="input-group">
+                    <label class="input-label">JUMLAH</label>
+                    <input type="number" id="currency-value" class="brutal-input" placeholder="Masukkan jumlah" step="any" min="0">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">DARI MATA UANG</label>
+                    <select id="currency-from" class="brutal-select">
+                        <option value="IDR">IDR — RUPIAH</option>
+                        <option value="USD">USD — US DOLLAR</option>
+                        <option value="EUR">EUR — EURO</option>
+                        <option value="SGD">SGD — SINGAPORE DOLLAR</option>
+                        <option value="JPY">JPY — JAPANESE YEN</option>
+                        <option value="MYR">MYR — RINGGIT MALAYSIA</option>
+                        <option value="GBP">GBP — BRITISH POUND</option>
+                        <option value="AUD">AUD — AUSTRALIAN DOLLAR</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">KE MATA UANG</label>
+                    <select id="currency-to" class="brutal-select">
+                        <option value="USD">USD — US DOLLAR</option>
+                        <option value="IDR">IDR — RUPIAH</option>
+                        <option value="EUR">EUR — EURO</option>
+                        <option value="SGD">SGD — SINGAPORE DOLLAR</option>
+                        <option value="JPY">JPY — JAPANESE YEN</option>
+                        <option value="MYR">MYR — RINGGIT MALAYSIA</option>
+                        <option value="GBP">GBP — BRITISH POUND</option>
+                        <option value="AUD">AUD — AUSTRALIAN DOLLAR</option>
+                    </select>
+                </div>
+                <button class="calc-btn" onclick="doTransform('currency')">
+                    <span>&#9654; KONVERSI SEKARANG</span>
+                </button>
+                <div id="currency-error" class="error-box hidden"></div>
+            </div>
+            <div class="panel panel-right">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>HASIL KONVERSI</span></div>
+                <div id="currency-output" class="output-area"><div class="output-placeholder"><div class="placeholder-symbol">&#9632;</div><p>MASUKKAN JUMLAH DAN PILIH MATA UANG</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FACTORIAL -->
+    <div id="tab-factorial" class="tab-content">
+        <div class="calc-layout">
+            <div class="panel panel-left">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>FAKTORIAL</span></div>
+                <div class="input-group">
+                    <label class="input-label">N (MAKSIMAL 20)</label>
+                    <input type="number" id="factorial-value" class="brutal-input" placeholder="0-20" min="0" max="20">
+                </div>
+                <button class="calc-btn" onclick="doTransform('factorial')">
+                    <span>&#9654; HITUNG FAKTORIAL</span>
+                </button>
+                <div id="factorial-error" class="error-box hidden"></div>
+            </div>
+            <div class="panel panel-right">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>HASIL FAKTORIAL</span></div>
+                <div id="factorial-output" class="output-area"><div class="output-placeholder"><div class="placeholder-symbol">&#9632;</div><p>MASUKKAN N DAN HITUNG</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIBONACCI -->
+    <div id="tab-fibonacci" class="tab-content">
+        <div class="calc-layout">
+            <div class="panel panel-left">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>DERET FIBONACCI</span></div>
+                <div class="input-group">
+                    <label class="input-label">JUMLAH SUKU (MAKSIMAL 50)</label>
+                    <input type="number" id="fibonacci-value" class="brutal-input" placeholder="1-50" min="1" max="50">
+                </div>
+                <button class="calc-btn" onclick="doTransform('fibonacci')">
+                    <span>&#9654; HITUNG FIBONACCI</span>
+                </button>
+                <div id="fibonacci-error" class="error-box hidden"></div>
+            </div>
+            <div class="panel panel-right">
+                <div class="panel-header"><div class="panel-header-bar"></div><span>DERET FIBONACCI</span></div>
+                <div id="fibonacci-output" class="output-area"><div class="output-placeholder"><div class="placeholder-symbol">&#9632;</div><p>MASUKKAN JUMLAH SUKU DAN HITUNG</p></div></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchTab(name) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+function doTransform(type) {
+    let payload = { type: type };
+    let errorId = type + '-error';
+    let outputId = type + '-output';
+
+    document.getElementById(errorId).classList.add('hidden');
+
+    if (type === 'base') {
+        payload.value = document.getElementById('base-value').value.trim();
+        payload.from_base = document.getElementById('base-from').value;
+        payload.to_base = document.getElementById('base-to').value;
+    } else if (type === 'temperature') {
+        payload.value = document.getElementById('temp-value').value.trim();
+        payload.from_unit = document.getElementById('temp-from').value;
+        payload.to_unit = document.getElementById('temp-to').value;
+    } else if (type === 'currency') {
+        payload.value = document.getElementById('currency-value').value.trim();
+        payload.from_currency = document.getElementById('currency-from').value;
+        payload.to_currency = document.getElementById('currency-to').value;
+    } else if (type === 'factorial') {
+        payload.value = document.getElementById('factorial-value').value.trim();
+    } else if (type === 'fibonacci') {
+        payload.value = document.getElementById('fibonacci-value').value.trim();
+    }
+
+    fetch('/api/transform', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            renderTransformResult(data, outputId);
+        } else {
+            document.getElementById(errorId).textContent = '[!] ' + data.error;
+            document.getElementById(errorId).classList.remove('hidden');
+        }
+    })
+    .catch(() => {
+        document.getElementById(errorId).textContent = '[!] KONEKSI GAGAL - COBA LAGI';
+        document.getElementById(errorId).classList.remove('hidden');
+    });
+}
+
+function renderTransformResult(data, outputId) {
+    const area = document.getElementById(outputId);
+    let stepsHtml = '';
+    (data.steps || []).forEach((s, i) => {
+        stepsHtml += '<div class="step-row"><span class="step-num">' + (i+1) + '</span><span class="step-text">' + s + '</span></div>';
+    });
+
+    area.innerHTML = '<div class="result-block">' +
+        '<div class="result-value">' + data.result + '</div>' +
+        '<div class="result-formula">FORMULA: <code>' + data.formula + '</code></div>' +
+        '</div>' +
+        '<div class="steps-block">' +
+        '<div class="steps-title">&#9632; LANGKAH PENYELESAIAN</div>' +
+        stepsHtml +
+        '</div>';
+}
+</script>
+{% endblock %}

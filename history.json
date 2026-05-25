@@ -1,0 +1,16 @@
+[
+  {
+    "category": "LOGIC",
+    "operation": "NAND",
+    "formula": "1 NAND 1 = 0",
+    "result": "FALSE (0)",
+    "timestamp": "25/05/2026 07:41:55"
+  },
+  {
+    "category": "ARITHMETIC",
+    "operation": "ADD",
+    "formula": "123.0 + 123241.0 = 123364.0",
+    "result": "123364",
+    "timestamp": "25/05/2026 07:41:48"
+  }
+]

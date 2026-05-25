@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRUTALCALC — {% block title %}KALKULATOR SOVIET{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Share+Tech+Mono&family=Bebas+Neue&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- NOISE TEXTURE OVERLAY -->
+<div class="noise-overlay"></div>
+
+<!-- CONSTRUCTIVIST DECORATIONS -->
+<div class="constructivist-bar top-bar"></div>
+<div class="constructivist-bar side-bar-left"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+    <div class="header-inner">
+        <div class="logo-block">
+            <div class="logo-star">&#9733;</div>
+            <div class="logo-text">
+                <span class="logo-main">BRUTALCALC</span>
+                <span class="logo-sub">SOVIET COMPUTATIONAL MACHINE</span>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+            <a href="/arithmetic" class="nav-link {% if request.path == '/arithmetic' or request.path == '/' %}active{% endif %}">
+                <span class="nav-icon">+</span> ARITMATIKA
+            </a>
+            <a href="/logic" class="nav-link {% if request.path == '/logic' %}active{% endif %}">
+                <span class="nav-icon">&amp;</span> LOGIKA
+            </a>
+            <a href="/transform" class="nav-link {% if request.path == '/transform' %}active{% endif %}">
+                <span class="nav-icon">~</span> TRANSFORM
+            </a>
+            <a href="/history" class="nav-link {% if request.path == '/history' %}active{% endif %}">
+                <span class="nav-icon">#</span> RIWAYAT
+            </a>
+        </nav>
+
+        <div class="header-controls">
+            <button class="theme-toggle" id="themeToggle" title="Toggle Dark/Light Mode">
+                <span id="themeIcon">&#9790;</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- RED DIVIDER LINE -->
+<div class="red-divider"></div>
+
+<!-- PAGE CONTENT -->
+<main class="main-content">
+    <!-- DIAGONAL ACCENT -->
+    <div class="diagonal-accent"></div>
+
+    <div class="page-header">
+        <div class="page-header-number">{% block page_number %}01{% endblock %}</div>
+        <div class="page-header-text">
+            <h1 class="page-title">{% block page_title %}TITLE{% endblock %}</h1>
+            <p class="page-desc">{% block page_desc %}Description{% endblock %}</p>
+        </div>
+        <div class="page-header-emblem">
+            <div class="emblem-shape">{% block page_icon %}&#9679;{% endblock %}</div>
+        </div>
+    </div>
+
+    {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-left">
+            <span class="footer-star">&#9733;</span>
+            <span>BRUTALCALC v1.0 &mdash; SOVIET COMPUTATIONAL APPARATUS</span>
+        </div>
+        <div class="footer-right">
+            <span>INDUSTRIAL COMPUTATION TERMINAL</span>
+        </div>
+    </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

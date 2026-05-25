@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}RIWAYAT{% endblock %}
+{% block page_number %}04{% endblock %}
+{% block page_title %}RIWAYAT PERHITUNGAN{% endblock %}
+{% block page_desc %}ARSIP OPERASI — MAKSIMAL 50 ENTRI TERAKHIR{% endblock %}
+{% block page_icon %}#{% endblock %}
+
+{% block content %}
+<div class="history-page">
+
+    <div class="history-controls">
+        <div class="history-count-block">
+            <span class="history-label">TOTAL ENTRI:</span>
+            <span class="history-count" id="historyCount">-</span>
+        </div>
+        <button class="danger-btn" onclick="clearHistory()">
+            &#9746; HAPUS SEMUA RIWAYAT
+        </button>
+    </div>
+
+    <div id="historyContainer">
+        <div class="loading-state">
+            <div class="loading-bar"></div>
+            <p>MEMUAT DATA ARSIP...</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadHistory() {
+    fetch('/api/history')
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('historyCount').textContent = data.length;
+        const container = document.getElementById('historyContainer');
+
+        if (data.length === 0) {
+            container.innerHTML = '<div class="empty-history">' +
+                '<div class="empty-icon">&#9632;</div>' +
+                '<p>TIDAK ADA RIWAYAT TERSIMPAN</p>' +
+                '<p>MULAI HITUNG UNTUK MENGISI ARSIP</p>' +
+                '</div>';
+            return;
+        }
+
+        let html = '<div class="history-table-wrapper"><table class="history-table">' +
+            '<thead><tr>' +
+            '<th>#</th>' +
+            '<th>KATEGORI</th>' +
+            '<th>OPERASI</th>' +
+            '<th>FORMULA</th>' +
+            '<th>HASIL</th>' +
+            '<th>WAKTU</th>' +
+            '</tr></thead><tbody>';
+
+        data.forEach((entry, i) => {
+            const catClass = 'cat-' + (entry.category || 'unknown').toLowerCase();
+            html += '<tr>' +
+                '<td class="row-num">' + (i + 1) + '</td>' +
+                '<td><span class="cat-badge ' + catClass + '">' + (entry.category || '-') + '</span></td>' +
+                '<td>' + (entry.operation || '-') + '</td>' +
+                '<td class="formula-cell"><code>' + (entry.formula || '-') + '</code></td>' +
+                '<td class="result-cell">' + (entry.result || '-') + '</td>' +
+                '<td class="time-cell">' + (entry.timestamp || '-') + '</td>' +
+                '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    })
+    .catch(() => {
+        document.getElementById('historyContainer').innerHTML =
+            '<div class="error-box">GAGAL MEMUAT RIWAYAT</div>';
+    });
+}
+
+function clearHistory() {
+    if (!confirm('HAPUS SEMUA RIWAYAT? TINDAKAN INI TIDAK DAPAT DIBATALKAN.')) return;
+
+    fetch('/api/history/clear', { method: 'POST' })
+    .then(r => r.json())
+    .then(() => loadHistory())
+    .catch(() => alert('GAGAL MENGHAPUS RIWAYAT'));
+}
+
+loadHistory();
+</script>
+{% endblock %}

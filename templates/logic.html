@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}LOGIKA{% endblock %}
+{% block page_number %}02{% endblock %}
+{% block page_title %}OPERATOR LOGIKA{% endblock %}
+{% block page_desc %}AND / OR / NOT / XOR / NAND / NOR — GERBANG LOGIKA BOOLEAN{% endblock %}
+{% block page_icon %}&amp;{% endblock %}
+
+{% block content %}
+<div class="calc-layout">
+
+    <!-- INPUT PANEL -->
+    <div class="panel panel-left">
+        <div class="panel-header">
+            <div class="panel-header-bar"></div>
+            <span>INPUT LOGIKA</span>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">INPUT A (0 = FALSE / 1 = TRUE)</label>
+            <div class="bool-toggle-group">
+                <button class="bool-btn active" id="btnA0" onclick="setBool('a', 0)">0 — FALSE</button>
+                <button class="bool-btn" id="btnA1" onclick="setBool('a', 1)">1 — TRUE</button>
+            </div>
+            <input type="hidden" id="inputA" value="0">
+        </div>
+
+        <div class="input-group" id="inputBGroup">
+            <label class="input-label">INPUT B (0 = FALSE / 1 = TRUE)</label>
+            <div class="bool-toggle-group">
+                <button class="bool-btn active" id="btnB0" onclick="setBool('b', 0)">0 — FALSE</button>
+                <button class="bool-btn" id="btnB1" onclick="setBool('b', 1)">1 — TRUE</button>
+            </div>
+            <input type="hidden" id="inputB" value="0">
+        </div>
+
+        <div class="operator-section">
+            <label class="input-label">PILIH OPERATOR</label>
+            <div class="operator-grid logic-grid">
+                <button class="op-btn" data-op="and" onclick="selectLogicOp('and')">AND</button>
+                <button class="op-btn" data-op="or" onclick="selectLogicOp('or')">OR</button>
+                <button class="op-btn" data-op="not" onclick="selectLogicOp('not')">NOT</button>
+                <button class="op-btn" data-op="xor" onclick="selectLogicOp('xor')">XOR</button>
+                <button class="op-btn" data-op="nand" onclick="selectLogicOp('nand')">NAND</button>
+                <button class="op-btn" data-op="nor" onclick="selectLogicOp('nor')">NOR</button>
+            </div>
+        </div>
+
+        <button class="calc-btn" id="calcBtn" onclick="doLogic()">
+            <span id="calcBtnText">&#9654; HITUNG SEKARANG</span>
+        </button>
+
+        <div id="errorBox" class="error-box hidden"></div>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="panel panel-right">
+        <div class="panel-header">
+            <div class="panel-header-bar"></div>
+            <span>OUTPUT LOGIKA</span>
+        </div>
+
+        <div id="outputArea" class="output-area">
+            <div class="output-placeholder">
+                <div class="placeholder-symbol">&#9632;</div>
+                <p>PILIH OPERATOR DAN SET NILAI INPUT<br>KEMUDIAN TEKAN HITUNG SEKARANG</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selectedOp = null;
+let valA = 0;
+let valB = 0;
+
+function setBool(which, val) {
+    if (which === 'a') {
+        valA = val;
+        document.getElementById('inputA').value = val;
+        document.getElementById('btnA0').classList.toggle('active', val === 0);
+        document.getElementById('btnA1').classList.toggle('active', val === 1);
+    } else {
+        valB = val;
+        document.getElementById('inputB').value = val;
+        document.getElementById('btnB0').classList.toggle('active', val === 0);
+        document.getElementById('btnB1').classList.toggle('active', val === 1);
+    }
+}
+
+function selectLogicOp(op) {
+    selectedOp = op;
+    document.querySelectorAll('.op-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-op="' + op + '"]').classList.add('active');
+
+    const bGroup = document.getElementById('inputBGroup');
+    if (op === 'not') {
+        bGroup.style.display = 'none';
+    } else {
+        bGroup.style.display = 'block';
+    }
+}
+
+function doLogic() {
+    if (!selectedOp) {
+        showError('PILIH OPERATOR TERLEBIH DAHULU');
+        return;
+    }
+
+    const btn = document.getElementById('calcBtn');
+    const btnText = document.getElementById('calcBtnText');
+
+    btn.disabled = true;
+    btnText.textContent = '... MEMPROSES ...';
+    hideError();
+
+    const payload = {
+        operation: selectedOp,
+        a: document.getElementById('inputA').value,
+        b: selectedOp === 'not' ? null : document.getElementById('inputB').value
+    };
+
+    fetch('/api/logic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.disabled = false;
+        btnText.textContent = '\u25BA HITUNG SEKARANG';
+        if (data.success) {
+            renderLogicResult(data);
+        } else {
+            showError(data.error);
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btnText.textContent = '\u25BA HITUNG SEKARANG';
+        showError('KONEKSI GAGAL - COBA LAGI');
+    });
+}
+
+function renderLogicResult(data) {
+    const area = document.getElementById('outputArea');
+    const isTrue = data.result_bool;
+    const resultClass = isTrue ? 'result-true' : 'result-false';
+
+    let stepsHtml = '';
+    (data.steps || []).forEach((s, i) => {
+        stepsHtml += '<div class="step-row"><span class="step-num">' + (i+1) + '</span><span class="step-text">' + s + '</span></div>';
+    });
+
+    // Truth table
+    let tableHtml = '<div class="truth-table-wrapper">';
+    tableHtml += '<div class="steps-title">&#9632; TABEL KEBENARAN</div>';
+    tableHtml += '<table class="truth-table">';
+
+    const isNot = data.operation === 'NOT';
+    if (isNot) {
+        tableHtml += '<thead><tr><th>A</th><th>NOT A</th></tr></thead><tbody>';
+        (data.truth_table || []).forEach(row => {
+            tableHtml += '<tr><td>' + row.a + '</td><td>' + row.result + '</td></tr>';
+        });
+    } else {
+        tableHtml += '<thead><tr><th>A</th><th>B</th><th>' + data.operation + '</th></tr></thead><tbody>';
+        (data.truth_table || []).forEach(row => {
+            tableHtml += '<tr><td>' + row.a + '</td><td>' + row.b + '</td><td>' + row.result + '</td></tr>';
+        });
+    }
+    tableHtml += '</tbody></table></div>';
+
+    area.innerHTML = '<div class="result-block">' +
+        '<div class="result-value ' + resultClass + '">' + data.result + '</div>' +
+        '<div class="result-formula">FORMULA: <code>' + data.formula + '</code></div>' +
+        '</div>' +
+        '<div class="steps-block">' +
+        '<div class="steps-title">&#9632; LANGKAH PENYELESAIAN</div>' +
+        stepsHtml +
+        '</div>' +
+        tableHtml;
+}
+
+function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.textContent = '[!] ' + msg;
+    box.classList.remove('hidden');
+}
+function hideError() {
+    document.getElementById('errorBox').classList.add('hidden');
+}
+</script>
+{% endblock %}

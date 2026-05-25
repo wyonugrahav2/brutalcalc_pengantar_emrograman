@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}ARITMATIKA{% endblock %}
+{% block page_number %}01{% endblock %}
+{% block page_title %}OPERASI ARITMATIKA{% endblock %}
+{% block page_desc %}PENJUMLAHAN / PENGURANGAN / PERKALIAN / PEMBAGIAN / MODULUS / PANGKAT / AKAR{% endblock %}
+{% block page_icon %}+{% endblock %}
+
+{% block content %}
+<div class="calc-layout">
+
+    <!-- INPUT PANEL -->
+    <div class="panel panel-left">
+        <div class="panel-header">
+            <div class="panel-header-bar"></div>
+            <span>INPUT PERHITUNGAN</span>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">BILANGAN A</label>
+            <input type="number" id="inputA" class="brutal-input" placeholder="0" step="any">
+        </div>
+
+        <div class="input-group" id="inputBGroup">
+            <label class="input-label">BILANGAN B</label>
+            <input type="number" id="inputB" class="brutal-input" placeholder="0" step="any">
+        </div>
+
+        <div class="operator-section">
+            <label class="input-label">PILIH OPERASI</label>
+            <div class="operator-grid">
+                <button class="op-btn" data-op="add" onclick="selectOp('add')">+ TAMBAH</button>
+                <button class="op-btn" data-op="subtract" onclick="selectOp('subtract')">- KURANG</button>
+                <button class="op-btn" data-op="multiply" onclick="selectOp('multiply')">&times; KALI</button>
+                <button class="op-btn" data-op="divide" onclick="selectOp('divide')">&divide; BAGI</button>
+                <button class="op-btn" data-op="modulus" onclick="selectOp('modulus')">% MODULUS</button>
+                <button class="op-btn" data-op="floor_division" onclick="selectOp('floor_division')">//FLOOR DIV</button>
+                <button class="op-btn" data-op="power" onclick="selectOp('power')">^ PANGKAT</button>
+                <button class="op-btn" data-op="sqrt" onclick="selectOp('sqrt')">&radic; AKAR</button>
+            </div>
+        </div>
+
+        <button class="calc-btn" id="calcBtn" onclick="doArithmetic()">
+            <span id="calcBtnText">&#9654; HITUNG SEKARANG</span>
+        </button>
+
+        <div id="errorBox" class="error-box hidden"></div>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="panel panel-right">
+        <div class="panel-header">
+            <div class="panel-header-bar"></div>
+            <span>OUTPUT HASIL</span>
+        </div>
+
+        <div id="outputArea" class="output-area">
+            <div class="output-placeholder">
+                <div class="placeholder-symbol">&#9632;</div>
+                <p>PILIH OPERASI DAN MASUKKAN NILAI<br>KEMUDIAN TEKAN HITUNG SEKARANG</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selectedOp = null;
+
+function selectOp(op) {
+    selectedOp = op;
+    document.querySelectorAll('.op-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-op="' + op + '"]').classList.add('active');
+
+    const bGroup = document.getElementById('inputBGroup');
+    if (op === 'sqrt') {
+        bGroup.style.display = 'none';
+    } else {
+        bGroup.style.display = 'block';
+    }
+}
+
+function doArithmetic() {
+    if (!selectedOp) {
+        showError('PILIH OPERASI TERLEBIH DAHULU');
+        return;
+    }
+
+    const a = document.getElementById('inputA').value.trim();
+    const b = document.getElementById('inputB').value.trim();
+    const btn = document.getElementById('calcBtn');
+    const btnText = document.getElementById('calcBtnText');
+
+    btn.disabled = true;
+    btnText.textContent = '... MENGHITUNG ...';
+    hideError();
+
+    const payload = { operation: selectedOp, a: a, b: b };
+
+    fetch('/api/arithmetic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.disabled = false;
+        btnText.textContent = '\u25BA HITUNG SEKARANG';
+        if (data.success) {
+            renderArithmeticResult(data);
+        } else {
+            showError(data.error);
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btnText.textContent = '\u25BA HITUNG SEKARANG';
+        showError('KONEKSI GAGAL - COBA LAGI');
+    });
+}
+
+function renderArithmeticResult(data) {
+    const area = document.getElementById('outputArea');
+    let stepsHtml = '';
+    (data.steps || []).forEach((s, i) => {
+        stepsHtml += '<div class="step-row"><span class="step-num">' + (i+1) + '</span><span class="step-text">' + s + '</span></div>';
+    });
+
+    area.innerHTML = '<div class="result-block">' +
+        '<div class="result-value">' + data.result + '</div>' +
+        '<div class="result-formula">FORMULA: <code>' + data.formula + '</code></div>' +
+        '</div>' +
+        '<div class="steps-block">' +
+        '<div class="steps-title">&#9632; LANGKAH PENYELESAIAN</div>' +
+        stepsHtml +
+        '</div>';
+}
+
+function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.textContent = '[!] ' + msg;
+    box.classList.remove('hidden');
+}
+
+function hideError() {
+    document.getElementById('errorBox').classList.add('hidden');
+}
+</script>
+{% endblock %}
